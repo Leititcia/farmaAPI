@@ -1,8 +1,8 @@
-# Gerenciamento Farmacêutico - API
+# 💊 Gerenciamento Farmacêutico - API
 
 Este projeto se trata de uma API construída utilizando o FastAPI para gerenciar um sistema simples de clientes e medicamentos. A aplicação permite a criação, leitura, atualização e exclusão de clientes e medicamentos por meio de rotas RESTful.
 
-### Principais Funcionalidades
+### ✨ Principais Funcionalidades
 
 - **Gerenciamento de Clientes:** Permite adicionar, listar, atualizar e excluir clientes.
 - **Gerenciamento de Medicamentos:** Permite adicionar, listar, atualizar e excluir medicamentos.
@@ -10,16 +10,16 @@ Este projeto se trata de uma API construída utilizando o FastAPI para gerenciar
 
 ---
 
-## Rotas da API
+## 👾 Rotas da API
 
-### Clientes
+### 👤 Clientes
 - `GET /clientes`: Lista todos os clientes.
 - `GET /clientes/{cliente_id}`: Obtém um cliente pelo ID.
 - `POST /clientes`: Adiciona um novo cliente.
 - `PUT /clientes/{cliente_id}`: Atualiza as informações de um cliente existente.
 - `DELETE /clientes/{cliente_id}`: Deleta um cliente.
 
-### Medicamentos
+### 💊 Medicamentos
 - `GET /medicamentos`: Lista todos os medicamentos.
 - `GET /medicamentos/{medicamento_id}`: Obtém um medicamento pelo ID.
 - `POST /medicamentos`: Adiciona um novo medicamento.
@@ -28,9 +28,9 @@ Este projeto se trata de uma API construída utilizando o FastAPI para gerenciar
 
 ---
 
-## Retorno da API
+## 📦 Retorno da API
 
-### POST /cliente
+### 📋 POST /cliente
 ``` bash
 {
   "id": 1,
@@ -41,7 +41,7 @@ Este projeto se trata de uma API construída utilizando o FastAPI para gerenciar
 
 ```
 
-### POST /medicamento
+### 📋 POST /medicamento
 ``` bash
 {
   "id": 0,
@@ -54,7 +54,7 @@ Este projeto se trata de uma API construída utilizando o FastAPI para gerenciar
 
 ---
 
-## Tecnologias Utilizadas
+## 🛠️ Tecnologias Utilizadas
 
 - **FastAPI**: Framework para construção de APIs em Python.
 - **Pydantic**: Biblioteca de validação de dados e criação de modelos.
@@ -62,7 +62,7 @@ Este projeto se trata de uma API construída utilizando o FastAPI para gerenciar
 
 ---
 
-## Como Clonar
+## 👩‍💻 Como Clonar
 
 1. **Clone o repositório**:
    ```
@@ -95,6 +95,23 @@ Este projeto se trata de uma API construída utilizando o FastAPI para gerenciar
 
 5. **Acesse a documentação da API**:
    - Após rodar o servidor, você pode acessar a documentação interativa da API no endereço: [http://localhost:8000/docs](http://localhost:8000/docs).
+
+---
+
+## 🌐 Arquivo JSON para Postman  
+
+Para facilitar os testes desta API, disponibilizamos um arquivo JSON com todas as rotas configuradas para importação no **Postman**.  
+
+### 📥 **Download do Arquivo**
+Clique no link abaixo para fazer o download do arquivo JSON:  
+[🔗 Link para o arquivo JSON no Google Drive](https://drive.google.com/file/d/1Sw-zXTa9JRvXkxax8Lz9iujolDKvPPBR/view?usp=sharing)  
+
+### 📖 **Como Importar no Postman**
+1. Baixe o arquivo JSON usando o link acima.  
+2. Abra o Postman e vá até a aba **"Collections"**.  
+3. Clique no botão **"Import"** (no canto superior esquerdo).  
+4. Selecione o arquivo JSON baixado e clique em **"Open"**.  
+5. A coleção de rotas será carregada no Postman, pronta para uso!  
 
 ---
 
