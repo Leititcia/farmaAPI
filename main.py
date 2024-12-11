@@ -20,6 +20,11 @@ class Medicamento(BaseModel):
 clientes = []
 medicamentos = []
 
+@app.get("/")
+async def root():
+    return {"message": "200 ok"}
+
+
 # Rotas Clientes
 @app.get("/clientes", response_model=List[Cliente])
 def listar_clientes():
@@ -58,6 +63,7 @@ def deletar_cliente(cliente_id: int):
             del clientes[index]
             return {"message": "Cliente deletado com sucesso."}
     raise HTTPException(status_code=404, detail="Cliente não encontrado.")
+
 
 # Rotas Medicamentos
 @app.get("/medicamentos", response_model=List[Medicamento])
