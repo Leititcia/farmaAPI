@@ -34,7 +34,6 @@ def add_client(client_id: int, client: schemas.ClientCreate, db: Session = Depen
     db.refresh(new_client)
     return new_client
 
-
 @router.put("/clients/{client_id}", response_model=schemas.Client)
 def update_client(client_id: int, updated_client: schemas.ClientCreate, db: Session = Depends(get_db)):
     client = db.query(models.Client).filter(models.Client.id == client_id).first()
@@ -47,11 +46,11 @@ def update_client(client_id: int, updated_client: schemas.ClientCreate, db: Sess
     db.refresh(client)
     return client
 
-@router.delete("/clients/{client_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/clients/{client_id}", response_model=dict, status_code=status.HTTP_200_OK)
 def delete_client(client_id: int, db: Session = Depends(get_db)):
     client = db.query(models.Client).filter(models.Client.id == client_id).first()
     if client is None:
         raise HTTPException(status_code=404, detail="Cliente não encontrado.")
     db.delete(client)
     db.commit()
-    return {"message": "Cliente deletado com sucesso."}
+    return {"message": f"Cliente com ID {client_id} deletado com sucesso."}

@@ -34,7 +34,6 @@ def add_medicine(medicine_id: int, medicine: schemas.MedicineCreate, db: Session
     db.refresh(new_medicine)
     return new_medicine
 
-
 @router.put("/medicines/{medicine_id}", response_model=schemas.Medicine)
 def update_medicine(medicine_id: int, updated_medicine: schemas.MedicineCreate, db: Session = Depends(get_db)):
     medicine = db.query(models.Medicine).filter(models.Medicine.id == medicine_id).first()
@@ -47,7 +46,7 @@ def update_medicine(medicine_id: int, updated_medicine: schemas.MedicineCreate, 
     db.refresh(medicine)
     return medicine
 
-@router.delete("/medicines/{medicine_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/medicines/{medicine_id}", status_code=status.HTTP_200_OK)
 def delete_medicine(medicine_id: int, db: Session = Depends(get_db)):
     medicine = db.query(models.Medicine).filter(models.Medicine.id == medicine_id).first()
     if medicine is None:
