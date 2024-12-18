@@ -94,13 +94,13 @@ Este projeto se trata de uma API construída utilizando o FastAPI para gerenciar
      ```
 
 5. **Acesse a documentação da API**:
-   - Após rodar o servidor, você pode acessar a documentação interativa da API no endereço: [http://localhost:8000/docs](http://localhost:8000/docs).
+   - Após iniciar o servidor, você pode acessar a documentação interativa da API no endereço: [http://localhost:8000/docs](http://localhost:8000/docs).
 
 ---
 
 ## 🌐 Arquivo JSON para Postman  
 
-Para facilitar os testes desta API, disponibilizamos um arquivo JSON com todas as rotas configuradas para importação no **Postman**.  
+Para facilitar os testes desta API, disponibilizo um arquivo JSON com todas as rotas configuradas para importação no **Postman**.  
 
 ### 📥 **Download do Arquivo**
 Clique no link abaixo para fazer o download do arquivo JSON:  
