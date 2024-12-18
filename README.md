@@ -60,8 +60,8 @@ Uma API RESTful baseada no FastAPI para gerencia farmacêutica. A API fornece en
 - `GET /api/clients`: Lista todos os clientes.
 - `GET /api/clients/{client_id}`: Obtém um cliente pelo ID.
 - `POST /api/clients{client_id}`: Adiciona um novo cliente.
-- `PUT /clients/{client_id}`: Atualiza as informações de um cliente existente.
-- `DELETE /clients/{client_id}`: Deleta um cliente.
+- `PUT /api/clients/{client_id}`: Atualiza as informações de um cliente existente.
+- `DELETE /api/clients/{client_id}`: Deleta um cliente.
 
 ### Medicines
 - `GET /api/medicines`: Lista todos os medicamentos.
