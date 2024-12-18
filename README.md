@@ -30,7 +30,7 @@ Este projeto se trata de uma API construída utilizando o FastAPI para gerenciar
 
 ## 📦 Retorno da API
 
-### 📋 POST /cliente
+### 📋 POST /clientes
 ``` bash
 {
   "id": 1,
@@ -41,7 +41,7 @@ Este projeto se trata de uma API construída utilizando o FastAPI para gerenciar
 
 ```
 
-### 📋 POST /medicamento
+### 📋 POST /medicamentos
 ``` bash
 {
   "id": 0,
