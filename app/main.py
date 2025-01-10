@@ -11,14 +11,6 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Alterar para domínios confiáveis em produção
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 app.include_router(routerClients, tags=['clients'], prefix='/api')
 app.include_router(routerMedicines, tags=['medicines'], prefix='/api')
 
