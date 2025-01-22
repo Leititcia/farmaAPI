@@ -19,16 +19,10 @@ def get_client(client_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Cliente não encontrado.")
     return client
 
-@router.post("/clients/{client_id}", response_model=schemas.Client, status_code=status.HTTP_201_CREATED)
-def add_client(client_id: int, client: schemas.ClientCreate, db: Session = Depends(get_db)):
-    saved_client = db.query(models.Client).filter(models.Client.id == client_id).first()
-    if saved_client:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=f"Já existe um cliente com o ID {client_id}."
-        )
-
-    new_client = models.Client(id=client_id, **client.dict())
+@router.post("/clients", response_model=schemas.Client, status_code=status.HTTP_201_CREATED)
+def add_client(client: schemas.ClientCreate, db: Session = Depends(get_db)):
+    # Criando o novo cliente sem passar o id, que será gerado automaticamente
+    new_client = models.Client(**client.dict())
     db.add(new_client)
     db.commit()
     db.refresh(new_client)

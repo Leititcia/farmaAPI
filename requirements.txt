@@ -5,3 +5,5 @@ SQLAlchemy
 psycopg2-binary
 pydantic-settings
 python-dotenv
+python-multipart
+jinja2
