@@ -19,16 +19,9 @@ def get_medicine(medicine_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Medicamento não encontrado.")
     return medicine
 
-@router.post("/medicines/{medicine_id}", response_model=schemas.Medicine, status_code=status.HTTP_201_CREATED)
-def add_medicine(medicine_id: int, medicine: schemas.MedicineCreate, db: Session = Depends(get_db)):
-    saved_medicine = db.query(models.Medicine).filter(models.Medicine.id == medicine_id).first()
-    if saved_medicine:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=f"Já existe um medicamento com o ID {medicine_id}."
-        )
-
-    new_medicine = models.Medicine(id=medicine_id, **medicine.dict())
+@router.post("/medicines", response_model=schemas.Medicine, status_code=status.HTTP_201_CREATED)
+def add_medicine(medicine: schemas.MedicineCreate, db: Session = Depends(get_db)):
+    new_medicine = models.Medicine(**medicine.dict())
     db.add(new_medicine)
     db.commit()
     db.refresh(new_medicine)
