@@ -1,11 +1,12 @@
 {% extends 'base.html' %}
 
 {% block content %}
+
 <div class="container mt-5">
     <h1 class="display-4 text-primary text-center">Adicionar Cliente</h1>
     <hr class="border-primary border-2">
 
-    <form action="/clientes/adicionar_cliente" method="POST">
+    <form action="/clientes/adicionar" method="POST">
         <div class="form-group">
             <label for="name">Nome</label>
             <input type="text" id="name" name="name" class="form-control shadow-sm" required>
@@ -23,4 +24,5 @@
         </div>
     </form>
 </div>
+
 {% endblock %}

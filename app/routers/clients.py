@@ -21,7 +21,6 @@ def get_client(client_id: int, db: Session = Depends(get_db)):
 
 @router.post("/clients", response_model=schemas.Client, status_code=status.HTTP_201_CREATED)
 def add_client(client: schemas.ClientCreate, db: Session = Depends(get_db)):
-    # Criando o novo cliente sem passar o id, que será gerado automaticamente
     new_client = models.Client(**client.dict())
     db.add(new_client)
     db.commit()
