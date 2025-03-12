@@ -1,105 +1,163 @@
-from fastapi import FastAPI, HTTPException, status
-from pydantic import BaseModel
-from typing import List
+from fastapi import FastAPI, Request, Depends, HTTPException, status, Form # Certifique-se de importar Depends aqui
+from app import models
+from .database import engine, get_db
+from fastapi.templating import Jinja2Templates
+from sqlalchemy.orm import Session
+from fastapi.responses import RedirectResponse
+from . import schemas  # Importar schemas corretamente
+
+
+from .routers.clients import router as routerClients
+from .routers.medicines import router as routerMedicines
+
+# Criar as tabelas no banco de dados
+models.Base.metadata.create_all(bind=engine)
+
+templates = Jinja2Templates(directory="templates")
 
 app = FastAPI()
 
-# basemodels
-class Cliente(BaseModel):
-    id: int
-    nome: str
-    email: str
-    telefone: str
-
-class Medicamento(BaseModel):
-    id: int
-    nome: str
-    quantidade: int
-    preco: float
-
-clientes = []
-medicamentos = []
+app.include_router(routerClients, tags=['clients'], prefix='/api')
+app.include_router(routerMedicines, tags=['medicines'], prefix='/api')
 
 @app.get("/")
-async def root():
-    return {"message": "200 ok"}
+def root(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
 
-# Rotas Clientes
-@app.get("/clientes", response_model=List[Cliente])
-def listar_clientes():
-    return clientes
+# clientes
+@app.get("/clientes")
+async def clientes(request: Request, db: Session = Depends(get_db)):
+    clients = db.query(models.Client).all()
+    return templates.TemplateResponse("clientes.html", {"request": request, "clients": clients})
 
-@app.get("/clientes/{cliente_id}", response_model=Cliente)
-def obter_cliente(cliente_id: int):
-    for cliente in clientes:
-        if cliente.id == cliente_id:
-            return cliente
-    raise HTTPException(status_code=404, detail="Cliente não encontrado.")
+@app.get("/clientes/adicionar")
+def add_client_form(request: Request):
+    return templates.TemplateResponse("adicionar_cliente.html", {"request": request})
 
-@app.post("/clientes", response_model=Cliente)
-async def adicionar_cliente(cliente: Cliente):
-    for c in clientes:
-        if c.id == cliente.id:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail=f"Já existe um cliente com o ID {cliente.id}."
-            )
-    clientes.append(cliente)
-    return cliente
+@app.post("/clientes/adicionar")
+def add_client(
+    name: str = Form(...),
+    email: str = Form(...),
+    phone: str = Form(None),
+    db: Session = Depends(get_db)
+):
+    new_client = models.Client(name=name, email=email, phone=phone)
+    db.add(new_client)
+    db.commit()
+    db.refresh(new_client)
+    return RedirectResponse(url="/clientes", status_code=status.HTTP_303_SEE_OTHER)
 
-@app.put("/clientes/{cliente_id}", response_model=Cliente)
-def atualizar_cliente(cliente_id: int, cliente_atualizado: Cliente):
-    for index, cliente in enumerate(clientes):
-        if cliente.id == cliente_id:
-            clientes[index] = cliente_atualizado
-            return cliente_atualizado
-    raise HTTPException(status_code=404, detail="Cliente não encontrado.")
+@app.get("/clientes/editar/{client_id}")
+def edit_client_form(client_id: int, request: Request, db: Session = Depends(get_db)):
+    client = db.query(models.Client).filter(models.Client.id == client_id).first()
+    if client is None:
+        raise HTTPException(status_code=404, detail="Cliente não encontrado.")
+    return templates.TemplateResponse("editar_cliente.html", {"request": request, "client": client})
 
-@app.delete("/clientes/{cliente_id}")
-def deletar_cliente(cliente_id: int):
-    for index, cliente in enumerate(clientes):
-        if cliente.id == cliente_id:
-            del clientes[index]
-            return {"message": "Cliente deletado com sucesso."}
-    raise HTTPException(status_code=404, detail="Cliente não encontrado.")
+@app.post("/clientes/editar/{client_id}")
+def edit_client(client_id: int, name: str = Form(...), email: str = Form(...), phone: str = Form(None), db: Session = Depends(get_db)):
+    existing_client = db.query(models.Client).filter(models.Client.id == client_id).first()
+    if existing_client is None:
+        raise HTTPException(status_code=404, detail="Cliente não encontrado.")
+    
+    existing_client.name = name
+    existing_client.email = email
+    if phone:
+        existing_client.phone = phone
+    
+    db.commit()
+    db.refresh(existing_client)
+    return RedirectResponse(url="/clientes", status_code=status.HTTP_303_SEE_OTHER)
+
+@app.get("/clientes/deletar/{client_id}")
+def delete_client_form(client_id: int, request: Request, db: Session = Depends(get_db)):
+    client = db.query(models.Client).filter(models.Client.id == client_id).first()
+    if client is None:
+        raise HTTPException(status_code=404, detail="Cliente não encontrado.")
+    return templates.TemplateResponse("deletar_cliente.html", {"request": request, "client": client})
+
+@app.post("/clientes/deletar/{client_id}")
+def delete_client(client_id: int, db: Session = Depends(get_db)):
+    client = db.query(models.Client).filter(models.Client.id == client_id).first()
+    if client is None:
+        raise HTTPException(status_code=404, detail="Cliente não encontrado.")
+    
+    db.delete(client)
+    db.commit()
+    return RedirectResponse(url="/clientes", status_code=status.HTTP_303_SEE_OTHER)
 
 
-# Rotas Medicamentos
-@app.get("/medicamentos", response_model=List[Medicamento])
-def listar_medicamentos():
-    return medicamentos
+# medicamentos
+@app.get("/medicamentos")
+async def listar_medicamentos(request: Request, db: Session = Depends(get_db)):
+    medicines = db.query(models.Medicine).all()
+    return templates.TemplateResponse("medicamentos.html", {"request": request, "medicines": medicines})
 
-@app.get("/medicamentos/{medicamento_id}", response_model=Medicamento)
-def obter_medicamento(medicamento_id: int):
-    for medicamento in medicamentos:
-        if medicamento.id == medicamento_id:
-            return medicamento
-    raise HTTPException(status_code=404, detail="Medicamento não encontrado.")
+@app.get("/medicamentos/adicionar")
+def add_medicine_form(request: Request):
+    return templates.TemplateResponse("adicionar_medicamento.html", {"request": request})
 
-@app.post("/medicamentos", response_model=Medicamento)
-async def adicionar_medicamento(medicamento: Medicamento):
-    for m in medicamentos:
-        if m.id == medicamento.id:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail=f"Já existe um medicamento com o ID {medicamento.id}."
-            )
-    medicamentos.append(medicamento)
-    return medicamento
+@app.post("/medicamentos/adicionar")
+def add_medicine(
+    name: str = Form(...), 
+    quantity: int = Form(...), 
+    price: float = Form(...), 
+    db: Session = Depends(get_db)
+):
 
-@app.put("/medicamentos/{medicamento_id}", response_model=Medicamento)
-def atualizar_medicamento(medicamento_id: int, medicamento_atualizado: Medicamento):
-    for index, medicamento in enumerate(medicamentos):
-        if medicamento.id == medicamento_id:
-            medicamentos[index] = medicamento_atualizado
-            return medicamento_atualizado
-    raise HTTPException(status_code=404, detail="Medicamento não encontrado.")
+    existing_medicine = db.query(models.Medicine).filter(models.Medicine.name == name).first()
+    if existing_medicine:
+        raise HTTPException(status_code=409, detail="Medicamento já cadastrado.")
 
-@app.delete("/medicamentos/{medicamento_id}")
-def remover_medicamento(medicamento_id: int):
-    for index, medicamento in enumerate(medicamentos):
-        if medicamento.id == medicamento_id:
-            del medicamentos[index]
-            return {"message": "Medicamento removido com sucesso."}
-    raise HTTPException(status_code=404, detail="Medicamento não encontrado.")
+    new_medicine = models.Medicine(name=name, quantity=quantity, price=price)
+    db.add(new_medicine)
+    db.commit()
+    db.refresh(new_medicine)
+
+    return RedirectResponse(url="/medicamentos", status_code=status.HTTP_303_SEE_OTHER)
+
+@app.get("/medicamentos/editar/{medicine_id}")
+def edit_medicine_form(medicine_id: int, request: Request, db: Session = Depends(get_db)):
+    medicine = db.query(models.Medicine).filter(models.Medicine.id == medicine_id).first()
+    if medicine is None:
+        raise HTTPException(status_code=404, detail="Medicamento não encontrado.")
+    return templates.TemplateResponse("editar_medicamento.html", {"request": request, "medicine": medicine})
+
+@app.post("/medicamentos/editar/{medicine_id}")
+def edit_medicine(
+    medicine_id: int,
+    name: str = Form(...),
+    quantity: int = Form(...),
+    price: float = Form(...),
+    db: Session = Depends(get_db)
+):
+
+    existing_medicine = db.query(models.Medicine).filter(models.Medicine.id == medicine_id).first()
+    if existing_medicine is None:
+        raise HTTPException(status_code=404, detail="Medicamento não encontrado.")
+    
+    existing_medicine.name = name
+    existing_medicine.quantity = quantity
+    existing_medicine.price = price
+    db.commit()
+    db.refresh(existing_medicine)
+    
+    return RedirectResponse(url="/medicamentos", status_code=status.HTTP_303_SEE_OTHER)
+
+@app.get("/medicamentos/deletar/{medicine_id}")
+def delete_medicine_form(medicine_id: int, request: Request, db: Session = Depends(get_db)):
+    medicine = db.query(models.Medicine).filter(models.Medicine.id == medicine_id).first()
+    if not medicine:
+        raise HTTPException(status_code=404, detail="Medicamento não encontrado.")
+    return templates.TemplateResponse("deletar_medicamento.html", {"request": request, "medicine": medicine})
+
+# Rota para realizar a deleção
+@app.post("/medicamentos/deletar/{medicine_id}")
+def delete_medicine(medicine_id: int, db: Session = Depends(get_db)):
+    medicine = db.query(models.Medicine).filter(models.Medicine.id == medicine_id).first()
+    if not medicine:
+        raise HTTPException(status_code=404, detail="Medicamento não encontrado.")
+    db.delete(medicine)
+    db.commit()
+    return RedirectResponse("/medicamentos", status_code=303)
