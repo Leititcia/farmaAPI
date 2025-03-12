@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+
+  api:
+    build: .
+    container_name: api-container
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    env_file:
+      - ./.env
+    volumes:
+      - .:/app
+    networks:
+      - pharmacy-network
+
+  db:
+    image: postgres:13
+    container_name: db-container
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pharmacy_db_data:/var/lib/postgresql/data
+    networks:
+      - pharmacy-network
+
+networks:
+  pharmacy-network:
+    driver: bridge
+
+volumes:
+  pharmacy_db_data:
+    driver: local
